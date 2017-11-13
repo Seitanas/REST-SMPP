@@ -1,0 +1,59 @@
+#!/usr/bin/env python
+
+import argparse
+import sys
+from module import Database
+from module import Config
+import hashlib
+
+
+
+def AddUser(username, password, salt):
+
+    db = Database.QueryDB()
+    reply = db.execute("SELECT id FROM users WHERE username = \"%s\"" % username)
+    if reply:
+        print ("User already exists!")
+        sys.exit(2)
+    md5hash = hashlib.md5( str(salt).encode('utf-8') + str(password).encode('utf-8') ).hexdigest()
+    db.commit("INSERT INTO users (username, password) VALUES (\"%s\", \"%s\")" % (username, md5hash))
+    db.close()
+
+def ModUser(username, password, salt):
+
+    db = Database.QueryDB()
+    reply = db.execute("SELECT id FROM users WHERE username = \"%s\"" % username)
+    if not reply:
+        print ("User does not exist!")
+        sys.exit(2)
+    md5hash = hashlib.md5( str(salt).encode('utf-8') + str(password).encode('utf-8') ).hexdigest()
+    db.commit("UPDATE users SET password = \"%s\" WHERE username = \"%s\"" % (md5hash, username))
+    db.close()
+
+def DelUser(username):
+
+    db = Database.QueryDB()
+    db.commit("DELETE FROM users WHERE username = \"%s\"" % username)
+    db.close()
+
+def main():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', nargs=2, help='Adds user.', metavar=('USERNAME', 'PASSWORD'))
+    parser.add_argument('-c', nargs=2, help='Changes user password.', metavar=('USERNAME', 'PASSWORD'))
+    parser.add_argument('-r', nargs=1, help='Removes user.', metavar=('USERNAME'))
+    if len(sys.argv)==1:
+        parser.print_help()
+        sys.exit(2)
+    results = parser.parse_args()
+    cfg = Config.ReadConfig()
+    salt = cfg.config.get('security', 'salt')
+    if results.a:
+        AddUser(results.a[0], results.a[1], salt)
+    elif results.c:
+        ModUser(results.c[0], results.c[1], salt)
+    elif results.r:
+        DelUser(results.r[0])
+
+if __name__ == '__main__':
+    main()
