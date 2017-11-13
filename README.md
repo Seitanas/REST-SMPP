@@ -25,7 +25,7 @@ Start web service:
 
 You should create user first:
 
-    ./user manager username password
+    ./user_manager username password
 
 In order to authenticate, you must post JSON formatted array to http://yourserver:8000/auth
 
