@@ -39,4 +39,3 @@ To send SMS you should post JSON formated array to http://yourserver:8000/sms an
 
      curl  -H "X-Auth-Token: c9529864cef4121c4b1fd1c804" -H "Content-Type: application/json" -XPOST -d '{"sendsms": {"sender":"someone","number":"1234565677","text":"somemessage"}}' http://localhost:8000/sms
 
-**Service code is still under development.**

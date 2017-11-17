@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+'''
+    Author: Tadas Ustinavičius
+            <tadas at ring dot lt>
+    2017.11.17
+'''
+
 from module import ErrorSerializer
 from module import Auth
 from module import SMS
