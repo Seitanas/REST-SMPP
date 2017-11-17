@@ -7,11 +7,11 @@ Application runs as REST service. It allows user to send SMS via SMPP protocol.
 
 
     mkdir sms
-    virtualenv --python=python3 sms/
+    virtualenv --python=python2.7 sms/
     souce sms/bin/activate
     git clone https://github.com/Seitanas/REST-SMPP
     cd REST-SMPP/
-    pip install gunicorn smpplib2 falcon mysql-connector
+    pip install gunicorn smpplib2 falcon mysql-connector configparser
     apt-get install mariadb-server
 
 Create DB from sms/sms.sql  
@@ -37,6 +37,6 @@ This should provide an authentication token:
 
 To send SMS you should post JSON formated array to http://yourserver:8000/sms and include `X-Auth-Token` in header:
 
-     curl  -H "X-Auth-Token: c9529864cef4121c4b1fd1c804" -H "Content-Type: application/json" -XPOST -d '{"sendsms": {"number":"+1234565677","text":"somemessage"}}' http://localhost:8000/sms
+     curl  -H "X-Auth-Token: c9529864cef4121c4b1fd1c804" -H "Content-Type: application/json" -XPOST -d '{"sendsms": {"sender":"someone","number":"1234565677","text":"somemessage"}}' http://localhost:8000/sms
 
 **Service code is still under development.**

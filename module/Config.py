@@ -4,4 +4,4 @@ class ReadConfig:
 
     def __init__(self):
         self.config = ConfigParser()
-        self.config.read('sms.cfg')
+        self.config.read('sms.cfg', encoding='cp1257')
