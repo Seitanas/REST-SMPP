@@ -50,7 +50,6 @@ class SendSMS:
                 return True
             except ValueError:
                 return False
-
         sender = sender.replace('+', '')
         if IsNumeric(sender[:1]) and IsNumeric(sender):
             '''
