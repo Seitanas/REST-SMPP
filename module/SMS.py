@@ -44,12 +44,20 @@ class SendSMS:
         '''
             Identify type of sender address (number, o text string)
         '''
-        if sender[:1] == '+' or isinstance(sender, int):
+        def IsNumeric(string):
+            try:
+                int (string)
+                return True
+            except ValueError:
+                return False
+
+        sender = sender.replace('+', '')
+        if IsNumeric(sender[:1]) and IsNumeric(sender):
             '''
-                We got number (+111222333 or 111222333)
+                We got number
             '''
             logger.debug("Got phone number as sender address")
-            ton_type = smpplib2.consts.SMPP_TON_INTL
+            ton_type = smpplib2.consts.SMPP_TON_NWSPEC
         else:
             '''
                 We got alphanumeric string
@@ -71,7 +79,6 @@ class SendSMS:
                     data_coding=encoding_flag,
                     registered_delivery=False,
             )
-            print(pdu.sequence)
             logger.info("Message was sent succefully")
             return 0
         except Exception, err:
