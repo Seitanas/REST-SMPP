@@ -9,11 +9,9 @@ from string import digits
 from datetime import datetime, timedelta
 
 
-
 def TokenGen(json_data):
 
     """Checks user credentials, generates Auth token"""
-
     db = QueryDB()
     reply = db.execute("SELECT id, password FROM users WHERE username = \"%s\"" % json_data["auth"]["username"])
     if len(reply):
@@ -40,6 +38,7 @@ def TokenGen(json_data):
 class AuthResource:
 
     def on_post(self, req, resp):
+
         try:
              post_data = req.stream.read().decode('utf-8')
         except Exception as ex:
@@ -47,7 +46,7 @@ class AuthResource:
         try:
              json_data = json.loads(post_data, encoding='utf-8')
         except ValueError:
-             raise falcon.HTTPError(falcon.HTTP_400, title = None, description = "Invalid JSON")
+            raise falcon.HTTPError(falcon.HTTP_400, title = None, description = "Invalid JSON")
         if "auth" in json_data:
             if "username" in json_data["auth"] and "password" in json_data["auth"]:
                 result = TokenGen(json_data)
