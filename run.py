@@ -4,7 +4,8 @@
 '''
     Author: Tadas Ustinavičius
             <tadas at ring dot lt>
-    2017.11.17
+    2017.11.20
+    https://github.com/Seitanas/REST-SMPP
 '''
 
 from module import ErrorSerializer
