@@ -44,7 +44,6 @@ class SMSSender:
         }
         try:
             reply = requests.post(REST_SMPP_ADRESS + '/sms', verify=False, data=self.json_data, headers=http_headers)
-            print (reply.text)
         except Exception, err:
             print("Error occured: %s", err)
 
@@ -94,7 +93,7 @@ def main():
         text = sys.argv[3]
     except:
         print ("Arguments missing: sms_sender SENDER RECIPIENT TEXT")
-
+        return 0
     auth = RESTAuthenticator()
     token_id = auth.CheckToken()
     if not token_id:
