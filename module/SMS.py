@@ -55,13 +55,13 @@ class SendSMS:
             '''
                 We got number
             '''
-            logger.debug("Got phone number as sender address")
+            logger.debug("Got phone number as sender address: %s", sender)
             ton_type = smpplib2.consts.SMPP_TON_NWSPEC
         else:
             '''
                 We got alphanumeric string
             '''
-            logger.debug("Got alphanumeric sender address")
+            logger.debug("Got alphanumeric sender address: %s", sender)
             ton_type = smpplib2.consts.SMPP_TON_ALNUM
         try:
             for part in parts:
