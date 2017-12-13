@@ -11,9 +11,10 @@ import logging
 
 class SendSMS:
 
-    def __init__(self, json_data):
+    def __init__(self, json_data, remote_addr):
 
         self.json_data = json_data
+        self.remote_addr = remote_addr
         cfg = Config.ReadConfig()
         self.smpp_user_id = cfg.config.get('smpp', 'userid')
         self.smpp_password = cfg.config.get('smpp', 'password')
@@ -28,7 +29,7 @@ class SendSMS:
         def smsc_message_resp_handler(pdu):
             logger.debug('SMSC has sent a response to our request "{}" "{}"\n'.format(pdu.sequence, pdu.message_id))
         def esme_sent_msg_handler(ssm):
-            logger.debug('we are about to send message: "{}" with sequence_number: "{}" to phone_number: "{}"'.format(ssm.short_message, ssm.sequence, ssm.destination_addr))
+            logger.debug('Trying to send message: "{}" with sequence_number: "{}" to phone_number: "{}"'.format(ssm.short_message, ssm.sequence, ssm.destination_addr))
 
         message = self.json_data['sendsms']['text']
         sender = self.json_data['sendsms']['sender'].encode("utf-8")
@@ -78,7 +79,7 @@ class SendSMS:
                     data_coding=encoding_flag,
                     registered_delivery=False,
             )
-            logger.info("Message was sent succefully")
+            logger.info("Message was sent succefully from address: %s", self.remote_addr)
             return 0
         except Exception, err:
             logger.info("Got exception: %s", err)
@@ -109,7 +110,7 @@ class SMSResource:
             if not len(reply):
                 logger.error("Wrong X-Auth-Token from: %s", req.remote_addr)
                 raise falcon.HTTPError(falcon.HTTP_401, title = None, description = "Token not found")
-            sms = SendSMS(json_data)
+            sms = SendSMS(json_data, req.remote_addr)
             if sms.run():
                 reply = {}
                 reply['status'] = 'error'
@@ -119,5 +120,6 @@ class SMSResource:
             resp.body = json.dumps(reply)
 
     def on_get(self, req, resp):
+        logger.debug("Token: Non-Post request")
         raise falcon.HTTPError(falcon.HTTP_400, title = None, description='Non-POST request')
 

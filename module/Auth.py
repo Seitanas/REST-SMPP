@@ -13,6 +13,7 @@ import logging
 def TokenGen(json_data):
 
     """Checks user credentials, generates Auth token"""
+    logger = logging.getLogger('REST-SMPP')
     db = QueryDB()
     reply = db.execute("SELECT id, password FROM users WHERE username = \"%s\"" % json_data["auth"]["username"])
     if len(reply):
@@ -21,8 +22,10 @@ def TokenGen(json_data):
         md5hash = hashlib.md5( str(salt).encode('utf-8') + str(json_data["auth"]["password"]).encode('utf-8') ).hexdigest()
         for pw in reply:
             if pw[1] != md5hash:
+                logger.error("Wrong username/password")
                 raise falcon.HTTPError(falcon.HTTP_400, title = None, description = "Wrong username/password")
             else:
+                logger.debug("User credentials OK. Generating token.")
                 curr_time = datetime.now()
                 created = curr_time.strftime("%Y-%m-%d %H:%M:%S")
                 expires = curr_time + timedelta(days=1)
@@ -35,6 +38,9 @@ def TokenGen(json_data):
                 reply['token']['created_at'] = created
                 reply['token']['expires_at'] = expires
                 return reply
+    else:
+        logger.error("Non existing user: %s", json_data["auth"]["username"])
+        raise falcon.HTTPError(falcon.HTTP_400, title = None, description = "Wrong username/password")
 
 class AuthResource:
 
@@ -42,7 +48,7 @@ class AuthResource:
     def on_post(self, req, resp):
 
         logger = logging.getLogger('REST-SMPP')
-        logger.debug("Got HTTP POST request from: %s", req.remote_addr)
+        logger.debug("Got HTTP AUTH request from: %s", req.remote_addr)
         try:
              post_data = req.stream.read().decode('utf-8')
         except Exception as ex:
@@ -55,7 +61,6 @@ class AuthResource:
             raise falcon.HTTPError(falcon.HTTP_400, title = None, description = "Invalid JSON")
         if "auth" in json_data:
             if "username" in json_data["auth"] and "password" in json_data["auth"]:
-                logger.debug("User credentials OK. Generating token.")
                 result = TokenGen(json_data)
                 resp.body = json.dumps(result)
 
@@ -64,5 +69,6 @@ class AuthResource:
             raise falcon.HTTPError(falcon.HTTP_400, title = None, description = "Missing user credentials in JSON")
 
     def on_get(self, req, resp):
+        logger.debug("AUTH: Non-Post request")
         raise falcon.HTTPError(falcon.HTTP_400, title = None, description='Non-POST request')
 
