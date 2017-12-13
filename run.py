@@ -18,8 +18,7 @@ import os
 import falcon
 
 
-
-logdir = "/var/log/SMS";
+logdir = "/var/log/SMS"
 if not os.path.exists(logdir):
     os.makedirs(logdir)
 logging.config.fileConfig('sms.cfg')
