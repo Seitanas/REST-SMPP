@@ -24,11 +24,11 @@ class SendSMS:
 
         logger = logging.getLogger('REST-SMPP')
         def received_message_handler(pdu):
-            logger.debug('SMSC has sent a request {} {}\n'.format(pdu.sequence, pdu.message_id))
+            logger.debug('SMSC has sent a request "{}" "{}"\n'.format(pdu.sequence, pdu.message_id))
         def smsc_message_resp_handler(pdu):
-            logger.debug('SMSC has sent a response to our request {} {}\n'.format(pdu.sequence, pdu.message_id))
+            logger.debug('SMSC has sent a response to our request "{}" "{}"\n'.format(pdu.sequence, pdu.message_id))
         def esme_sent_msg_handler(ssm):
-            logger.debug('we are about to send message: {} with sequence_number:{} to phone_number: {}'.format(ssm.short_message, ssm.sequence, ssm.destination_addr))
+            logger.debug('we are about to send message: "{}" with sequence_number: "{}" to phone_number: "{}"'.format(ssm.short_message, ssm.sequence, ssm.destination_addr))
 
         message = self.json_data['sendsms']['text']
         sender = self.json_data['sendsms']['sender'].encode("utf-8")
@@ -89,19 +89,25 @@ class SendSMS:
 class SMSResource:
 
     def on_post(self, req, resp):
+
+        logger = logging.getLogger('REST-SMPP')
+        logger.debug("Got X-Auth-Token from: %s", req.remote_addr)
         try:
              post_data = req.stream.read().decode('utf-8')
         except Exception as ex:
+            logger.debug("SMS error occurred: %s", ex)
             raise falcon.HTTPError(falcon.HTTP_400, title = None, description = ex.message)
         try:
             json_data = json.loads(post_data, encoding='utf-8')
-        except ValueError:
+        except ValueError as ex:
+            logger.debug("SMS error occurred: %s", ex)
             raise falcon.HTTPError(falcon.HTTP_400, title = None, description = "Invalid JSON")
         if "sendsms" in json_data:
             token = req.get_header('X-Auth-Token')
             db = QueryDB()
             reply = db.execute("SELECT id FROM tokens WHERE token = \"%s\" AND expires > NOW()" % token)
             if not len(reply):
+                logger.error("Wrong X-Auth-Token from: %s", req.remote_addr)
                 raise falcon.HTTPError(falcon.HTTP_401, title = None, description = "Token not found")
             sms = SendSMS(json_data)
             if sms.run():

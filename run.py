@@ -24,6 +24,7 @@ if not os.path.exists(logdir):
     os.makedirs(logdir)
 logging.config.fileConfig('sms.cfg')
 logger = logging.getLogger('REST-SMPP')
+logger.debug("Starting REST-SMPP")
 
 smsApp = falcon.API()
 smsApp.set_error_serializer(ErrorSerializer.Response)

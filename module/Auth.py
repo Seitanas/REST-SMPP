@@ -7,6 +7,7 @@ import hashlib
 from random import choice
 from string import digits
 from datetime import datetime, timedelta
+import logging
 
 
 def TokenGen(json_data):
@@ -37,22 +38,29 @@ def TokenGen(json_data):
 
 class AuthResource:
 
+
     def on_post(self, req, resp):
 
+        logger = logging.getLogger('REST-SMPP')
+        logger.debug("Got HTTP POST request from: %s", req.remote_addr)
         try:
              post_data = req.stream.read().decode('utf-8')
         except Exception as ex:
+             logger.error("Auth error occurred: %s", ex)
              raise falcon.HTTPError(falcon.HTTP_400, title = None, description = ex.message)
         try:
              json_data = json.loads(post_data, encoding='utf-8')
-        except ValueError:
+        except ValueError as ex:
+            logger.error("Auth error occurred: %s", ex)
             raise falcon.HTTPError(falcon.HTTP_400, title = None, description = "Invalid JSON")
         if "auth" in json_data:
             if "username" in json_data["auth"] and "password" in json_data["auth"]:
+                logger.debug("User credentials OK. Generating token.")
                 result = TokenGen(json_data)
                 resp.body = json.dumps(result)
 
         else:
+            logger.debug("Missing user credentials in JSON")
             raise falcon.HTTPError(falcon.HTTP_400, title = None, description = "Missing user credentials in JSON")
 
     def on_get(self, req, resp):

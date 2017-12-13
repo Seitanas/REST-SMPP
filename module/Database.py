@@ -1,5 +1,6 @@
 import mysql.connector as mariadb
 from module import Config
+import logging
 
 """Class for SQL queries"""
 
@@ -7,13 +8,17 @@ class QueryDB(object):
 
     def __init__(self):
 
+        logger = logging.getLogger('REST-SMPP')
         cfg = Config.ReadConfig()
         mysql_host = cfg.config.get('mysql', 'host')
         mysql_user = cfg.config.get('mysql', 'user')
         mysql_pass = cfg.config.get('mysql', 'password')
         mysql_db = cfg.config.get('mysql', 'db')
-        self.conn = mariadb.connect(host=mysql_host, port='3306', user=mysql_user, passwd=mysql_pass, db=mysql_db)
-        self.cursor = self.conn.cursor()
+        try:
+            self.conn = mariadb.connect(host=mysql_host, port='3306', user=mysql_user, passwd=mysql_pass, db=mysql_db)
+            self.cursor = self.conn.cursor()
+        except Exception as ex:
+            logger.error("Database error occurred: %s", ex)
 
     def execute(self, query_string):
         self.cursor.execute(query_string)
