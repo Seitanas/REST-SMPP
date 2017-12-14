@@ -90,7 +90,9 @@ class AuthResource:
                                    "credentials in JSON")
 
     def on_get(self, req, resp):
-        logger.debug("AUTH: Non-Post request")
+
+        logger = logging.getLogger('REST-SMPP')
+        logger.error("AUTH: Non-Post request from: %s", req.access_route[0])
         raise falcon.HTTPError(falcon.HTTP_400,
                                title=None,
                                description='Non-POST request')
