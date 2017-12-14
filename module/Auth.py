@@ -61,7 +61,7 @@ class AuthResource:
     def on_post(self, req, resp):
 
         logger = logging.getLogger('REST-SMPP')
-        logger.debug("Got HTTP AUTH request from: %s", req.remote_addr)
+        logger.debug("Got HTTP AUTH request from: %s", req.access_route[0])
         try:
             post_data = req.stream.read().decode('utf-8')
         except Exception as ex:

@@ -129,11 +129,11 @@ class SMSResource:
                                "= \"%s\" AND expires > NOW()" % token)
             if not len(reply):
                 logger.error("Wrong X-Auth-Token from: %s",
-                             req.remote_addr)
+                             req.access_route[0])
                 raise falcon.HTTPError(falcon.HTTP_401,
                                        title=None,
                                        description="Token not found")
-            sms = SendSMS(json_data, req.remote_addr)
+            sms = SendSMS(json_data, req.access_route[0])
             if sms.run():
                 reply = {}
                 reply['status'] = 'error'
