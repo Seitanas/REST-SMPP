@@ -15,9 +15,10 @@ class QueryDB(object):
         mysql_user = cfg.config.get('mysql', 'user')
         mysql_pass = cfg.config.get('mysql', 'password')
         mysql_db = cfg.config.get('mysql', 'db')
+        mysql_port = cfg.config.get('mysql', 'port')
         try:
             self.conn = mariadb.connect(host=mysql_host,
-                                        port='3306',
+                                        port=mysql_port,
                                         user=mysql_user,
                                         passwd=mysql_pass,
                                         db=mysql_db)
