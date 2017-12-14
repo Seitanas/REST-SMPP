@@ -40,3 +40,5 @@ ALTER TABLE `tokens`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+CREATE EVENT `remove_expired_tokens` ON SCHEDULE EVERY 1 HOUR DO DELETE FROM tokens WHERE expires < NOW()

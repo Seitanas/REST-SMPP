@@ -15,6 +15,9 @@ Application runs as REST service. It allows user to send SMS via SMPP protocol.
     apt-get install mariadb-server
 
 Create DB from sms/sms.sql  
+You also should enable event scheduler in mysql server:  
+Add `event_scheduler=on` in your my.cnf file in [mysqld] section.  
+  
 Configure sms.cfg file
 
 
