@@ -4,7 +4,7 @@
 '''
     Author: Tadas Ustinavičius
             <tadas at ring dot lt>
-    2017.11.20
+    2017.12.14
     https://github.com/Seitanas/REST-SMPP
 '''
 
@@ -15,28 +15,35 @@ from module import Config
 import hashlib
 
 
-
 def AddUser(username, password, salt):
 
     db = Database.QueryDB()
-    reply = db.execute("SELECT id FROM users WHERE username = \"%s\"" % username)
+    reply = db.execute("SELECT id FROM users WHERE username = \"%s\"" %
+                       username)
     if reply:
-        print ("User already exists!")
+        print("User already exists!")
         sys.exit(2)
-    md5hash = hashlib.md5( str(salt).encode('utf-8') + str(password).encode('utf-8') ).hexdigest()
-    db.commit("INSERT INTO users (username, password) VALUES (\"%s\", \"%s\")" % (username, md5hash))
+    md5hash = hashlib.md5(str(salt).encode('utf-8') +
+                          str(password).encode('utf-8')).hexdigest()
+    db.commit("INSERT INTO users (username, password) VALUES "
+              "(\"%s\", \"%s\")" % (username, md5hash))
     db.close()
+
 
 def ModUser(username, password, salt):
 
     db = Database.QueryDB()
-    reply = db.execute("SELECT id FROM users WHERE username = \"%s\"" % username)
+    reply = db.execute("SELECT id FROM users WHERE username = \"%s\"" %
+                       username)
     if not reply:
         print ("User does not exist!")
         sys.exit(2)
-    md5hash = hashlib.md5( str(salt).encode('utf-8') + str(password).encode('utf-8') ).hexdigest()
-    db.commit("UPDATE users SET password = \"%s\" WHERE username = \"%s\"" % (md5hash, username))
+    md5hash = hashlib.md5(str(salt).encode('utf-8') +
+                          str(password).encode('utf-8')).hexdigest()
+    db.commit("UPDATE users SET password = \"%s\" WHERE "
+              "username = \"%s\"" % (md5hash, username))
     db.close()
+
 
 def DelUser(username):
 
@@ -44,13 +51,17 @@ def DelUser(username):
     db.commit("DELETE FROM users WHERE username = \"%s\"" % username)
     db.close()
 
+
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-a', nargs=2, help='Adds user.', metavar=('USERNAME', 'PASSWORD'))
-    parser.add_argument('-c', nargs=2, help='Changes user password.', metavar=('USERNAME', 'PASSWORD'))
-    parser.add_argument('-r', nargs=1, help='Removes user.', metavar=('USERNAME'))
-    if len(sys.argv)==1:
+    parser.add_argument('-a', nargs=2, help='Adds user.',
+                        metavar=('USERNAME', 'PASSWORD'))
+    parser.add_argument('-c', nargs=2, help='Changes user password.',
+                        metavar=('USERNAME', 'PASSWORD'))
+    parser.add_argument('-r', nargs=1, help='Removes user.',
+                        metavar=('USERNAME'))
+    if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(2)
     results = parser.parse_args()

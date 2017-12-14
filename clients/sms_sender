@@ -4,37 +4,35 @@
 '''
     Author: Tadas Ustinavičius
             <tadas at ring dot lt>
-    2017.11.20
+    2017.12.14
     https://github.com/Seitanas/REST-SMPP
 '''
-
-
-
-REST_SMPP_ADRESS = 'http://localhost:8000'
-REST_SMPP_USER = 'test'
-REST_SMPP_PASSWORD = 'test'
-
-TOKEN_FILE = '/tmp/REST-SMMP-TOKEN'
-
 import sys
 import json
 import requests
 import pickle
 import datetime
 
+REST_SMPP_ADRESS = 'http://localhost:8000'
+REST_SMPP_USER = 'test'
+REST_SMPP_PASSWORD = 'test'
+TOKEN_FILE = '/tmp/REST-SMMP-TOKEN'
+
 
 class SMSSender:
 
     def __init__(self, sender, recipient, text, token_id):
 
-        self.sender  = sender
+        self.sender = sender
         self.recipient = recipient
         self.text = text
         self.token_id = token_id
 
     def BuildJSON(self):
 
-        self.json_data = json.dumps({"sendsms":{'sender': self.sender, 'number': self.recipient, 'text': self.text}})
+        self.json_data = json.dumps({"sendsms": {'sender': self.sender,
+                                                 'number': self.recipient,
+                                                 'text': self.text}})
 
     def SendSMS(self):
 
@@ -43,10 +41,12 @@ class SMSSender:
             'X-Auth-Token': self.token_id,
         }
         try:
-            reply = requests.post(REST_SMPP_ADRESS + '/sms', verify=False, data=self.json_data, headers=http_headers)
+            reply = requests.post(REST_SMPP_ADRESS + '/sms',
+                                  verify=False,
+                                  data=self.json_data,
+                                  headers=http_headers)
         except Exception, err:
             print("Error occured: %s", err)
-
 
 
 class RESTAuthenticator:
@@ -60,21 +60,27 @@ class RESTAuthenticator:
                 return 0
 
             now = datetime.datetime.now()
-            expires_at = datetime.datetime.strptime(token_data['expires_at'],'%Y-%m-%d %H:%M:%S')
+            expires_at = datetime.datetime.strptime(token_data['expires_at'],
+                                                    '%Y-%m-%d %H:%M:%S')
             time_left = expires_at - now
-            if int(time_left.total_seconds()) > 60: #if token expires in more than 60 seconds
+            # if token expires in more than 60 seconds
+            if int(time_left.total_seconds()) > 60:
                 return token_data['id']
             else:
                 return 0
 
         def BuildJSON(self):
 
-            self.json_data = json.dumps({'auth':{'username': REST_SMPP_USER, 'password': REST_SMPP_PASSWORD}})
+            self.json_data = json.dumps(
+                                {'auth': {'username': REST_SMPP_USER,
+                                          'password': REST_SMPP_PASSWORD}})
 
         def Authenticate(self):
 
             try:
-                reply = requests.post(REST_SMPP_ADRESS + '/auth', verify=False, data=self.json_data)
+                reply = requests.post(REST_SMPP_ADRESS + '/auth',
+                                      verify=False,
+                                      data=self.json_data)
             except Exception, err:
                 print("Error occured: %s", err)
             try:
@@ -85,6 +91,7 @@ class RESTAuthenticator:
             with open(tokenfile, 'wb') as fi:
                 pickle.dump(json_data['token'], fi)
             return json_data['token']['id']
+
 
 def main():
     try:
