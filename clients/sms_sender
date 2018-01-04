@@ -21,6 +21,7 @@ TOKEN_FILE = '/tmp/REST-SMMP-TOKEN'
 
 TOKEN_FILE = TOKEN_FILE + "_" + str(os.getuid())
 
+
 class SMSSender:
 
     def __init__(self, sender, recipient, text, token_id):
