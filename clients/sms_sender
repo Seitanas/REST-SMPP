@@ -4,20 +4,22 @@
 '''
     Author: Tadas Ustinavičius
             <tadas at ring dot lt>
-    2017.12.14
+    2018.01.04
     https://github.com/Seitanas/REST-SMPP
 '''
-import sys
-import json
-import requests
-import pickle
 import datetime
+import json
+import os
+import pickle
+import requests
+import sys
 
 REST_SMPP_ADRESS = 'http://localhost:8000'
 REST_SMPP_USER = 'test'
 REST_SMPP_PASSWORD = 'test'
 TOKEN_FILE = '/tmp/REST-SMMP-TOKEN'
 
+TOKEN_FILE = TOKEN_FILE + "_" + str(os.getuid())
 
 class SMSSender:
 
